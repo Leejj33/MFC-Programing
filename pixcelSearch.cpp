@@ -12,6 +12,8 @@ void ClickFunc(int x, int y)
     // 마우스 클릭 이벤트를 발생시키기 위해 좌표를 정규화
     static const int normalizedValue = 65535;
 
+    // 모니터 default(디스플레이1) 로 가지고와서 디스플레이2 에서 실행 시 클릭 이벤트는 디스플레이1 에서 작동
+    // 모니터 정보 가지고 올 때 그림판이 활성화 된 모니터로 적용 (아니면 그냥 주 모니터에 세팅하라고 주문하면 될 듯)
     HMONITOR monitor = MonitorFromWindow(hWndPaint, MONITOR_DEFAULTTONEAREST);
     MONITORINFO mi;
     std::memset(&mi, 0, sizeof(MONITORINFO));
