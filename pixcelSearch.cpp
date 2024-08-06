@@ -1,23 +1,3 @@
-void KeyFunc(WORD key)
-{
-    INPUT input;
-    input.type = INPUT_KEYBOARD;
-    input.ki.wScan = MapVirtualKey(key, MAPVK_VK_TO_VSC);
-    input.ki.time = 0;
-    input.ki.dwExtraInfo = 0;
-    input.ki.wVk = key;
-    input.ki.dwFlags = 0;
-    SendInput(1, &input, sizeof(INPUT));
-
-    Sleep(100);
-
-    input.ki.dwFlags = KEYEVENTF_KEYUP;
-    SendInput(1, &input, sizeof(INPUT));
-
-    Sleep(100);
-    AfxMessageBox(_T("키보드 입력 성공"));
-}
-
 void ClickFunc(int x, int y)
 {
     // 그림판 프로그램의 윈도우 핸들 가져오기
@@ -63,12 +43,53 @@ void ClickFunc(int x, int y)
 
 }
 
+void KeyFunc(WORD key)
+{
+    HWND hWndPaint = ::FindWindow(_T("MSPaintApp"), NULL);
+
+    if (SetForegroundWindow(hWndPaint)) {
+        AfxMessageBox(_T("그림판 창 활성화 성공"));
+    }
+    else {
+        AfxMessageBox(_T("그림판 창 활성화 실패"));
+    }
+
+    INPUT input[2];
+
+    // 키 누르기 이벤트
+    input[0].type = INPUT_KEYBOARD;
+    input[0].ki.wScan = MapVirtualKey(key, MAPVK_VK_TO_VSC);
+    input[0].ki.time = 0;
+    input[0].ki.dwExtraInfo = 0;
+    input[0].ki.wVk = key;
+    input[0].ki.dwFlags = 0; // Key down
+
+    // 키 떼기 이벤트
+    input[1].type = INPUT_KEYBOARD;
+    input[1].ki.wScan = MapVirtualKey(key, MAPVK_VK_TO_VSC);
+    input[1].ki.time = 0;
+    input[1].ki.dwExtraInfo = 0;
+    input[1].ki.wVk = key;
+    input[1].ki.dwFlags = KEYEVENTF_KEYUP; // Key up
+
+    // 입력 이벤트 전송
+    UINT uSent = SendInput(2, input, sizeof(INPUT));
+    if (uSent != 2) {
+        AfxMessageBox(_T("키보드 입력 실패"));
+        return;
+    }
+
+    // 입력 후 잠시 대기
+    Sleep(100);
+
+    AfxMessageBox(_T("키보드 입력 성공"));
+}
+
 void CMFCSampleDlg::OnBnClickPixcelSearch()
 {
     // TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
     // 픽셀 서치 시작
     AfxMessageBox(_T("픽셀 서치 시작"));
-    KeyFunc(VK_SPACE);
 
     // 그림판 프로그램의 윈도우 핸들 가져오기
     HWND hWndPaint = ::FindWindow(_T("MSPaintApp"), NULL);
@@ -78,7 +99,6 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
     }
     else {
         AfxMessageBox(_T("그림판 프로그램 FIND 성공."));
-        KeyFunc(VK_SPACE);
     }
 
     // 그림 그리는 영역의 DC 가져오기
@@ -138,7 +158,7 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
             AfxMessageBox(msg);
      
             //ClickFunc(foundX, foundY);
-            //KeyFunc(VK_SPACE);
+            KeyFunc(VK_SPACE);
 
             break;
         }
@@ -150,3 +170,4 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
     // 그림판이 화면이 띄워져 있는게 아니면 픽셀 서치 안됨 OnBnClickPixcelSearch() 픽셀 서치중일땐 화면 띄워놔야 할듯 
     // 위에 조건 해결 못하면 한 피씨에서 다클라 많이는 못 땡길듯
     // 디스 플레이 1, 2 있는 경우 이것도 따로 설정해야함 디스 플레이 2로 창을 옮기고 실행 시 클릭 을 디스플레이 1에다가 함
+}
