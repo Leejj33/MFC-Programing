@@ -83,6 +83,11 @@ void KeyFunc(WORD key)
     Sleep(100);
 
     AfxMessageBox(_T("키보드 입력 성공"));
+
+    
+    // 현재 동작하는지 확인 안됨
+    // 키보드 입력 메세지가 안뜨는 상황 
+    // 그림판 focus 문제인지 focus는 되는데 클릭이 안되는지 추가 테스트 필요
 }
 
 void CMFCSampleDlg::OnBnClickPixcelSearch()
