@@ -45,13 +45,13 @@ void ClickFunc(int x, int y)
 
 void KeyFunc(WORD key)
 {
-    HWND hWndPaint = ::FindWindow(_T("MSPaintApp"), NULL);
+    HWND hWndPaint = ::FindWindow(_T("Gersang"), NULL);
 
     if (SetForegroundWindow(hWndPaint)) {
-        AfxMessageBox(_T("그림판 창 활성화 성공"));
+        AfxMessageBox(_T("창 활성화 성공"));
     }
     else {
-        AfxMessageBox(_T("그림판 창 활성화 실패"));
+        AfxMessageBox(_T("창 활성화 실패"));
     }
 
     INPUT input[2];
@@ -83,11 +83,6 @@ void KeyFunc(WORD key)
     Sleep(100);
 
     AfxMessageBox(_T("키보드 입력 성공"));
-
-    
-    // 현재 동작하는지 확인 안됨
-    // 키보드 입력 메세지가 안뜨는 상황 
-    // 그림판 focus 문제인지 focus는 되는데 클릭이 안되는지 추가 테스트 필요
 }
 
 void CMFCSampleDlg::OnBnClickPixcelSearch()
@@ -97,13 +92,13 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
     AfxMessageBox(_T("픽셀 서치 시작"));
 
     // 그림판 프로그램의 윈도우 핸들 가져오기
-    HWND hWndPaint = ::FindWindow(_T("MSPaintApp"), NULL);
+    HWND hWndPaint = ::FindWindow(_T("Gersang"), NULL);
     if (hWndPaint == NULL) {
-        AfxMessageBox(_T("그림판 프로그램을 찾을 수 없습니다."));
+        AfxMessageBox(_T("프로그램을 찾을 수 없습니다."));
         return;
     }
     else {
-        AfxMessageBox(_T("그림판 프로그램 FIND 성공."));
+        AfxMessageBox(_T("프로그램 FIND 성공."));
     }
 
     // 그림 그리는 영역의 DC 가져오기
@@ -113,7 +108,7 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
         return;
     }
     else {
-        AfxMessageBox(_T("그림판 DC 정보 호출 성공."));
+        AfxMessageBox(_T("DC 정보 호출 성공."));
         KeyFunc(VK_SPACE);
     }
 
