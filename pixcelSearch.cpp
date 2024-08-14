@@ -1,3 +1,22 @@
+#include "pch.h"
+#include "framework.h"
+#include "MFCSample.h"
+#include "MFCSampleDlg.h"
+#include "afxdialogex.h"
+
+#include <vector>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+#include <windows.h>
+#include <tchar.h>
+#include <afxwin.h>
+
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 void ClickFunc(int x, int y)
 {
     // 그림판 프로그램의 윈도우 핸들 가져오기
@@ -142,26 +161,58 @@ void CMFCSampleDlg::OnBnClickPixcelSearch()
     DeleteDC(hdcMem);
     ::ReleaseDC(hWndPaint, hdc);
 
-    COLORREF targetColor = RGB(237, 28, 36); // 검색할 색 (빨간색)
+    // 색상 정의
+    COLORREF blueColor = RGB(0, 0, 255); // 파랑색
+    COLORREF redColor = RGB(255, 0, 0); // 빨간색
 
+    POINT bluePoint = { -1, -1 }; // 기준점 위치
+    std::vector<POINT> redPoints; // 빨간색 위치 저장
+
+    // 픽셀 색상 및 위치를 저장
     for (int i = 0; i < width * height; i++) {
         BYTE b = pPixels[i * 4];
         BYTE g = pPixels[i * 4 + 1];
         BYTE r = pPixels[i * 4 + 2];
         COLORREF color = RGB(r, g, b);
 
-        if (color == targetColor) {
-            int foundX = i % width;
-            int foundY = i / width;
-            CString msg;
-            msg.Format(_T("검색된 위치: (%d, %d)"), foundX, foundY);
-            AfxMessageBox(msg);
-     
-            //ClickFunc(foundX, foundY);
-            KeyFunc(VK_SPACE);
+        int x = i % width;
+        int y = i / width;
 
-            break;
+        if (color == blueColor) {
+            bluePoint = POINT{ x, y };
         }
+        else if (color == redColor) {
+            redPoints.push_back(POINT{ x, y });
+        }
+    }
+
+    if (bluePoint.x == -1 || bluePoint.y == -1) {
+        AfxMessageBox(_T("기준점 색(파랑색)을 찾을 수 없습니다."));
+        delete[] pPixels;
+        return;
+    }
+
+    // 가장 가까운 빨간색 위치 찾기
+    POINT closestRedPoint = { -1, -1 };
+    double minDistance = DBL_MAX; // 초기값은 무한대
+
+    for (const POINT& redPoint : redPoints) {
+        double distance = sqrt(pow((redPoint.x - bluePoint.x), 2) + pow((redPoint.y - bluePoint.y), 2));
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestRedPoint = redPoint;
+        }
+    }
+
+    if (closestRedPoint.x != -1 && closestRedPoint.y != -1) {
+        CString msg;
+        msg.Format(_T("가장 가까운 빨간색 위치: (%d, %d)"), closestRedPoint.x, closestRedPoint.y);
+        AfxMessageBox(msg);
+        ClickFunc(closestRedPoint.x, closestRedPoint.y);
+        KeyFunc(VK_SPACE); // 필요 시 여기에 추가 작업
+    }
+    else {
+        AfxMessageBox(_T("빨간색을 찾을 수 없습니다."));
     }
 
     delete[] pPixels;
